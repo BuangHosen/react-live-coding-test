@@ -28,6 +28,7 @@ function PokeDex() {
   const [sort, setSort] = useState(sortOptions[0].value);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(5);
+  const [pokemonInformation, setPokemonInformation] = useState({});
 
   const customStyles = {
     content: {
@@ -63,6 +64,14 @@ function PokeDex() {
       setIsLoading(false);
     });
   }, [setIsLoading]);
+
+  useEffect(() => {
+    if (pokemonDetail) {
+      axios
+        .get(pokemonDetail?.url)
+        .then((res) => setPokemonInformation(res.data));
+    }
+  }, [pokemonDetail]);
 
   if (!isLoading && pokemons.length === 0) {
     return (
@@ -148,13 +157,12 @@ function PokeDex() {
           style={customStyles}
         >
           <div>
-            Requirement:
+            <img src={pokemonInformation?.sprites?.front_default} alt='' />
+            Stats:
             <ul>
-              <li>show the sprites front_default as the pokemon image</li>
-              <li>
-                Show the stats details - only stat.name and base_stat is
-                required
-              </li>
+              {pokemonInformation?.stats?.map(({ base_stat, stat }, index) => (
+                <li key={`${index}`}>{`${stat.name} - ${base_stat}`}</li>
+              ))}
             </ul>
           </div>
         </Modal>
